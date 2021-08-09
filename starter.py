@@ -17,7 +17,7 @@ class Graph:
         return self.G
 class Node:
     graph = nx.Graph()
-    VISITED = True
+    VISITED = False
 
     def getNodeID(self):
         digest = ''
@@ -119,7 +119,7 @@ def callRecursive(address, parent, node):
             clientNodeUpdate(item, node)
             
             
-node.VISITED = not(node.VISITED)
+# node.VISITED = not(node.VISITED)
 neighbors = node.neighbors()
 for item in neighbors:
     # if not clientNodeStatus(item):
