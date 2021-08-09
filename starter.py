@@ -118,14 +118,14 @@ def callRecursive(address, parent, node):
         if not clientNodeStatus(item):
             clientNodeUpdate(item, node)
             
-            
+print(node.neighbors())            
 node.VISITED = not(node.VISITED)
 neighbors = node.neighbors()
 for item in neighbors:
     if not clientNodeStatus(item):
         print(item)
-    # clientNodeUpdate(item, node)
-# print(node.neighbors())
+        clientNodeUpdate(item, node)
+
 
 
 
