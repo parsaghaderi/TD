@@ -62,9 +62,9 @@ def server(address, n):
         elif req['request'] == 'update':
             print("{} request for update".format(clientAddress))
             # callRecursive(address, clientAddress, n)
-            # clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
+            clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
             n.VISITED = not(n.VISITED)
-            # clientSocket.close()
+            clientSocket.close()
         else:
             clientSocket.send(json.dumps({'response':'bad_request'}).encode())
         clientSocket.close()
