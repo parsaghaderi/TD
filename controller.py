@@ -34,11 +34,12 @@ class Node:
     def neighbors(self):
         #TODO this is for local test only
         neighbor = []
-        for items in sp.getoutput('ip -4 neighbor').split('\n'):
-            if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
-                neighbor.append(items.split()[0])
+        # for items in sp.getoutput('ip -4 neighbor').split('\n'):
+        #     if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
+        #         neighbor.append(items.split()[0])
+        for items in sys.argv[2:]:
+            neighbor.append(items)
         return neighbor
-
 
 node = Node()
 print(nx.to_dict_of_dicts(node.graph))
