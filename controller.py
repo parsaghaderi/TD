@@ -18,7 +18,8 @@ class Graph:
 class Node:
     graph = nx.Graph()
     VISITED = False
-
+    
+    #TODO store this in variable so we don't calculate it each time.
     def getNodeID(self):
         digest = ''
         for items in sp.getoutput('ip link show').split('\n')[1::2]:
@@ -60,7 +61,7 @@ def server(address, n):
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print("{} request for update".format(clientAddress))
-            callRecursive(address, clientAddress, n)
+            # callRecursive(address, clientAddress, n)
             clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
             n.VISITED = not(n.VISITED)
             clientSocket.close()
