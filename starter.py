@@ -124,5 +124,5 @@ neighbors = node.neighbors()
 for item in neighbors:
     if not clientNodeStatus(item):
         print(item)
-        clientNodeUpdate(item, node)
+        # clientNodeUpdate(item, node)
 #print(node.neighbors())
