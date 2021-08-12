@@ -18,7 +18,7 @@ class Graph:
 class Node:
     graph = nx.Graph()
     VISITED = False
-    lock = True
+    lock = False
     
     #TODO store this in variable so we don't calculate it each time.
     def getNodeID(self):
@@ -124,6 +124,7 @@ def callRecursive(parent, node):
     except:
         pass
     for item in neighbors:
+        print('items' + item)
         if not clientNodeStatus(item):
             clientNodeUpdate(item, node)
             
