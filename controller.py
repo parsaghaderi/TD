@@ -40,7 +40,7 @@ class Node:
         #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
             neighbor.append('132.205.9.'+items)
-            self.graph.add_edge(sys.argv[1], '132.205.9.'+items)
+            self.graph.add_edge(self.getNodeID(), '132.205.9.'+items)
         return neighbor
 
 node = Node()
@@ -121,8 +121,8 @@ def callRecursive(parent, node):
         print("****")
         if item != parent:
             print('not equal')
-            # if not clientNodeStatus(item):
-            clientNodeUpdate(item, node)
+            if not clientNodeStatus(item):
+                clientNodeUpdate(item, node)
             
             
 
