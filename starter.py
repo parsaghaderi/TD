@@ -83,9 +83,9 @@ def clientNodeStatus(address):
     s.send(json.dumps({'request':'status'}).encode())
     print('*****')
     response = json.loads(s.recv(10000).decode())
-    print(json.loads(s.recv(10000).decode()))
+    print(response.values())
     s.close()
-    return response['response']
+    # return response.values()
 
 def clientNodeUpdate(address, node):
     print("requesting for update from {}".format(address))
