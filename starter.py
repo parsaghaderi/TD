@@ -83,6 +83,7 @@ def clientNodeStatus(address):
     s.send(json.dumps({'request':'status'}).encode())
     print(json.loads(s.recv(10000).decode()))
     s.close()
+    return json.loads(s.recv(10000).decode())['response']
 
 def clientNodeUpdate(address, node):
     print("requesting for update from {}".format(address))
@@ -117,7 +118,7 @@ def callRecursive(address, parent, node):
     for item in neighbors:
         if not clientNodeStatus(item):
             clientNodeUpdate(item, node)
-            
+
 print('neighbors')      
 print(node.neighbors())            
 node.VISITED = True
