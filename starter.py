@@ -81,7 +81,8 @@ def clientNodeStatus(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'status'}).encode())
-    print('***' + json.loads(s.recv(10000).decode()))
+    print('*****')
+    print(json.loads(s.recv(10000).decode()))
     s.close()
     
 
