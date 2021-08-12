@@ -121,8 +121,8 @@ def callRecursive(parent, node):
         print("****")
         if item != parent:
             print('not equal')
-            if not clientNodeStatus(item):
-                clientNodeUpdate(item, node)
+            # if not clientNodeStatus(item):
+            clientNodeUpdate(item, node)
             
             
 
