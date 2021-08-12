@@ -74,7 +74,7 @@ def server(address, n):
             print("****")
             #semaphore lock
             while node.lock:
-                pass
+                print('lock')
             node.lock = True
             node.VISITED = True
             callRecursive(address[0], node)
