@@ -124,7 +124,7 @@ print(node.neighbors())
 node.VISITED = True
 neighbors = node.neighbors()
 for item in neighbors:
-    print('status of' + item+ ' ' +clientNodeStatus(item))
+    clientNodeStatus(item)
         # print(item)
         # clientNodeUpdate(item, node)
 
