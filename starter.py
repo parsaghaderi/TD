@@ -83,7 +83,7 @@ def clientNodeStatus(address):
     s.send(json.dumps({'request':'status'}).encode())
     print('*****')
     response = json.loads(s.recv(10000).decode())
-    print(response.values())
+    print(response.values()[0])
     s.close()
     # return response.values()
 
