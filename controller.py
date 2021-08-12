@@ -57,13 +57,17 @@ def server(address, n):
         print("node {} connected".format(address))
         req = json.loads(clientSocket.recv(10000).decode())
         if req['request'] == 'status':
-            print('incoming request for status from '+ address)
+            print("incoming request for status from ")
+            print(address)
+            print("****")
             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
         elif req['request'] == 'id':
             print('incoming request for id from ' + address)
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
-            print('incoming request for update from ' + address)
+            print('incoming request for update from ')
+            print(address)
+            print("****")
             #semaphore lock
             while node.lock:
                 pass
