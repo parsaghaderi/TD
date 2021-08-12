@@ -101,7 +101,8 @@ print(nx.to_dict_of_dicts(node.graph))
 
 print('neighbors')      
 print(node.neighbors())  
-          
+
 node.VISITED = True
 
 callRecursive(node)
+print(nx.to_dict_of_lists(node))
