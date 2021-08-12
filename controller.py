@@ -60,7 +60,11 @@ def server(address, n):
             print("incoming request for status from ")
             print(address)
             print("****")
+            while node.lock:
+                pass
+            node.lock = True
             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
+            node.lock = False
         elif req['request'] == 'id':
             print('incoming request for id from ' + address)
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
