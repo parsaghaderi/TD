@@ -110,7 +110,10 @@ def clientNodeUpdate(address, node):
 
 def callRecursive(parent, node):
     for item in node.neighbors():
-        print("recurring with " + item + "parent is" + parent)
+        print("****")
+        print(item)
+        print(parent)
+        print("****")
         if item != parent:
             if not clientNodeStatus(item):
                 clientNodeUpdate(item, node)
