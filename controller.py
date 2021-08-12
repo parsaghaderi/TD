@@ -78,7 +78,7 @@ def server(address, n):
             node.lock = True
             node.VISITED = True
             callRecursive(address[0], node)
-            clientSocket.send(json.dumps({'response': n.neighbors()}).encode())
+            clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
             node.lock = False
         else:
             clientSocket.send(json.dumps({'response':'bad_request'}).encode())
