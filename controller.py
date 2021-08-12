@@ -23,7 +23,11 @@ def clientNodeID(address):
     s.send(json.dumps({'request':'id'}).encode())
     response = json.loads(s.recv(10000).decode())
     s.close()
-    return response.get('response')
+    print('node ID response')
+    print(response['response'])
+    print("###")
+    
+    return response['response']
 
 class Node:
     graph = nx.Graph()
@@ -77,6 +81,7 @@ def server(address, n):
             node.lock = False
         elif req['request'] == 'id':
             print('incoming request for id from ' + address)
+            
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print('incoming request for update from ')
