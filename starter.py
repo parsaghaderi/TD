@@ -34,15 +34,9 @@ class Node:
     def neighbors(self):
         #TODO this is for local test only
         neighbor = []
-        # for items in sp.getoutput('ip -4 neighbor').split('\n'):
-        #     if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
-        #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
             neighbor.append('132.205.9.'+items)
         return neighbor
-
-node = Node()
-print(nx.to_dict_of_dicts(node.graph))
 
 def server(address, n):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,7 +81,7 @@ def clientNodeStatus(address):
     return response.get('response')
 
 def clientNodeUpdate(address, node):
-    print("requesting for update from {}".format(address))
+    print("outgoing request for update from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'update'}).encode())
@@ -95,44 +89,19 @@ def clientNodeUpdate(address, node):
     print(msg)
     tmp = nx.from_dict_of_dicts(msg['response'])
     nx.Graph.update(node.graph, tmp)
-    # options = {
-    # "font_size": 10,
-    # "node_size": 1000,
-    # "node_color": "white",
-    # "edgecolors": "black",
-    # "linewidths": 1,
-    # "width": 5,
-    # }
-    # nx.draw_networkx(node.graph, **options)
-    # ax = plt.gca()
-    # ax.margins(0.20)
-    # plt.axis("off")
-    # plt.savefig('TD.png')
-    # s.close()
 
 def callRecursive(node):
-    neighbors = node.neighbors()
-    for item in neighbors:
+    for item in node.neighbors():
         if not clientNodeStatus(item):
             clientNodeUpdate(item, node)
 
+
+node = Node()
+print(nx.to_dict_of_dicts(node.graph))
+
 print('neighbors')      
-print(node.neighbors())            
+print(node.neighbors())  
+          
 node.VISITED = True
-neighbors = node.neighbors()
-for item in neighbors:
-    # if not clientNodeStatus(item):
-    #     callRecursive(item, '132.205.9.'+sys.argv[1], node)
-        # print(item)
-        # clientNodeUpdate(item, node)
-    callRecursive(node)
 
-
-
-
-
-'''
-*-----*
- \   /
-   *
-'''
+callRecursive(node)
