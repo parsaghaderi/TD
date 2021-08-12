@@ -18,6 +18,7 @@ class Graph:
 class Node:
     graph = nx.Graph()
     VISITED = False
+    lock = True
     
     #TODO store this in variable so we don't calculate it each time.
     def getNodeID(self):
@@ -62,7 +63,8 @@ def server(address, n):
         elif req['request'] == 'update':
             print("{} request for update".format(clientAddress))
             # callRecursive(address, clientAddress, n)
-            clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
+            # clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
+            clientSocket.send(json.dumps({'response': n.neighbors()}).encode())
             n.VISITED = not(n.VISITED)
             clientSocket.close()
         else:
@@ -112,6 +114,7 @@ def clientNodeUpdate(address, node):
 def callRecursive(address, parent, node):
     print("call recursively called")
     neighbors = node.neighbors()
+    print(sys.argv[1]+"--"+neighbors)
     try:
         neighbors.remove(parent)
     except:
