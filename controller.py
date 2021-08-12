@@ -40,7 +40,7 @@ class Node:
         #     if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
         #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
-            neighbor.append(items)
+            neighbor.append('132.205.9.'+items)
         return neighbor
 
 node = Node()
@@ -48,6 +48,7 @@ print(nx.to_dict_of_dicts(node.graph))
 
 def server(address, n):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    address = '132.205.9.' + address
     s.bind((address, 8001))
     s.listen()
     while True:
