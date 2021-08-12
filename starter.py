@@ -83,9 +83,8 @@ def clientNodeStatus(address):
     s.send(json.dumps({'request':'status'}).encode())
     print('*****')
     response = json.loads(s.recv(10000).decode())
-    print(response.get('response'))
     s.close()
-    # return response.values()
+    return response.get('response')
 
 def clientNodeUpdate(address, node):
     print("requesting for update from {}".format(address))
@@ -126,7 +125,8 @@ print(node.neighbors())
 node.VISITED = True
 neighbors = node.neighbors()
 for item in neighbors:
-    clientNodeStatus(item)
+    if clientNodeStatus(item):
+        print('###########')
         # print(item)
         # clientNodeUpdate(item, node)
 
