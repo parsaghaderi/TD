@@ -21,9 +21,9 @@ def clientNodeID(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'id'}).encode())
-    id = json.loads(s.recv(10000).decode())
+    response = json.loads(s.recv(10000).decode())
     s.close()
-    return id
+    return response.get('response')
 
 class Node:
     graph = nx.Graph()
@@ -50,7 +50,6 @@ class Node:
         #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
             neighbor.append('132.205.9.'+items)
-            
             self.graph.add_edge(self.getNodeID(), clientNodeID('132.205.9.'+items))
         return neighbor
 
