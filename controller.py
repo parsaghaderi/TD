@@ -26,7 +26,6 @@ class Node:
         for items in sp.getoutput('ip link show').split('\n')[1::2]:
             digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
         return hashlib.sha256(digest.encode()).hexdigest()
-    
     def getGraph(self):
         return self.graph
 
@@ -41,6 +40,7 @@ class Node:
         #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
             neighbor.append('132.205.9.'+items)
+            self.graph.add_edge(sys.argv[1], '132.205.9.'+items)
         return neighbor
 
 node = Node()
@@ -103,7 +103,7 @@ def clientNodeStatus(address):
     return response.get('response')
 
 def clientNodeUpdate(address, node):
-    print("outgoing request for update from {}".format(address))
+    print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'update'}).encode())
