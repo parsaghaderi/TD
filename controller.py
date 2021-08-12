@@ -117,7 +117,8 @@ def clientNodeUpdate(address, node):
 def callRecursive(parent, node):
     print("callrecursive called")
     neighbors = node.neighbors()
-    print(sys.argv[1]+"--"+neighbors)
+    print('neighbors:')
+    print(neighbors)
     try:
         neighbors.remove(parent)
     except:
