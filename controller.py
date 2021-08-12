@@ -63,7 +63,7 @@ def server(address, n):
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print("{} request for update".format(clientAddress))
-            # callRecursive(address, clientAddress, n)
+            callRecursive(clientAddress, n)
             # clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
             clientSocket.send(json.dumps({'response': n.neighbors()}).encode())
             n.VISITED = not(n.VISITED)
@@ -85,8 +85,10 @@ def clientNodeStatus(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'status'}).encode())
-    print(json.loads(s.recv(10000).decode()))
+    response = json.loads(s.recv(10000).decode())
+    print(response)
     s.close()
+    return response.get('response')
 
 def clientNodeUpdate(address, node):
     print("requesting for update from {}".format(address))
@@ -97,23 +99,23 @@ def clientNodeUpdate(address, node):
     print(msg)
     tmp = nx.from_dict_of_dicts(msg['response'])
     nx.Graph.update(node.graph, tmp)
-    options = {
-    "font_size": 10,
-    "node_size": 1000,
-    "node_color": "white",
-    "edgecolors": "black",
-    "linewidths": 1,
-    "width": 5,
-    }
-    nx.draw_networkx(node.graph, **options)
-    ax = plt.gca()
-    ax.margins(0.20)
-    plt.axis("off")
-    plt.savefig('TD.png')
-    s.close()
+    # options = {
+    # "font_size": 10,
+    # "node_size": 1000,
+    # "node_color": "white",
+    # "edgecolors": "black",
+    # "linewidths": 1,
+    # "width": 5,
+    # }
+    # nx.draw_networkx(node.graph, **options)
+    # ax = plt.gca()
+    # ax.margins(0.20)
+    # plt.axis("off")
+    # plt.savefig('TD.png')
+    # s.close()
 
-def callRecursive(address, parent, node):
-    print("call recursively called")
+def callRecursive(parent, node):
+    print("callrecursive called")
     neighbors = node.neighbors()
     print(sys.argv[1]+"--"+neighbors)
     try:

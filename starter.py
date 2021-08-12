@@ -95,27 +95,23 @@ def clientNodeUpdate(address, node):
     print(msg)
     tmp = nx.from_dict_of_dicts(msg['response'])
     nx.Graph.update(node.graph, tmp)
-    options = {
-    "font_size": 10,
-    "node_size": 1000,
-    "node_color": "white",
-    "edgecolors": "black",
-    "linewidths": 1,
-    "width": 5,
-    }
-    nx.draw_networkx(node.graph, **options)
-    ax = plt.gca()
-    ax.margins(0.20)
-    plt.axis("off")
-    plt.savefig('TD.png')
-    s.close()
+    # options = {
+    # "font_size": 10,
+    # "node_size": 1000,
+    # "node_color": "white",
+    # "edgecolors": "black",
+    # "linewidths": 1,
+    # "width": 5,
+    # }
+    # nx.draw_networkx(node.graph, **options)
+    # ax = plt.gca()
+    # ax.margins(0.20)
+    # plt.axis("off")
+    # plt.savefig('TD.png')
+    # s.close()
 
-def callRecursive(address, parent, node):
+def callRecursive(node):
     neighbors = node.neighbors()
-    try:
-        neighbors.remove(parent)
-    except:
-        pass
     for item in neighbors:
         if not clientNodeStatus(item):
             clientNodeUpdate(item, node)
@@ -125,10 +121,11 @@ print(node.neighbors())
 node.VISITED = True
 neighbors = node.neighbors()
 for item in neighbors:
-    if clientNodeStatus(item):
-        print('###########')
+    # if not clientNodeStatus(item):
+    #     callRecursive(item, '132.205.9.'+sys.argv[1], node)
         # print(item)
         # clientNodeUpdate(item, node)
+    callRecursive(node)
 
 
 
