@@ -38,7 +38,7 @@ class Node:
         #     if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
         #         neighbor.append(items.split()[0])
         for items in sys.argv[2:]:
-            neighbor.append(items)
+            neighbor.append('132.205.9.'+items)
         return neighbor
 
 node = Node()
