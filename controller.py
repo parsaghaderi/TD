@@ -63,7 +63,7 @@ def server(address, n):
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print("{} request for update".format(clientAddress))
-            callRecursive(clientAddress, n)
+            # callRecursive(clientAddress, n)
             # clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
             clientSocket.send(json.dumps({'response': n.neighbors()}).encode())
             n.VISITED = not(n.VISITED)
