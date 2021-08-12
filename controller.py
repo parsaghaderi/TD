@@ -53,6 +53,7 @@ def server(address, n):
     s.listen()
     while True:
         clientSocket, clientAddress = s.accept()
+        address = clientAddress
         print("node {} connected".format(address))
         req = json.loads(clientSocket.recv(10000).decode())
         if req['request'] == 'status':
@@ -68,7 +69,7 @@ def server(address, n):
                 pass
             node.lock = True
             node.VISITED = True
-            callRecursive()
+            callRecursive(address, node)
             clientSocket.send(json.dumps({'response': n.neighbors()}).encode())
             node.lock = False
         else:
