@@ -99,6 +99,7 @@ def server(address, n):
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
+            node.neighbors()
         elif req['request'] == 'update':
             print('incoming request for update from ')
             print(address)
