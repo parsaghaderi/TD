@@ -40,7 +40,7 @@ class Node:
         # for items in sp.getoutput('ip link show').split('\n')[1::2]:
         #     digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
         # return hashlib.sha256(digest.encode()).hexdigest()
-        return sys.argv[2]
+        return '132.205.9.'+sys.argv[2]
 
     def getGraph(self):
         return self.graph
