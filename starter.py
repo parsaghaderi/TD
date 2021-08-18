@@ -15,16 +15,33 @@ class Graph:
         self.g.add_edge(node1, node2)
     def getUpdate(self):
         return self.G
+
+def clientNodeID(address):
+    print("requesting for id from {}".format(address))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'id'}).encode())
+    response = json.loads(s.recv(10000).decode())
+    s.close()
+    print('node ID response')
+    print(response['response'])
+    print("###")
+    
+    return response['response']
+
+
 class Node:
     graph = nx.Graph()
     VISITED = False
 
     def getNodeID(self):
-        digest = ''
-        for items in sp.getoutput('ip link show').split('\n')[1::2]:
-            digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
-        return hashlib.sha256(digest.encode()).hexdigest()
-    
+        # TODO for testing the unique ID is changed to primary IP address of each node. 
+        # digest = ''
+        # for items in sp.getoutput('ip link show').split('\n')[1::2]:
+        #     digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
+        # return hashlib.sha256(digest.encode()).hexdigest()
+        return sys.argv[2]
+
     def getGraph(self):
         return self.graph
 
@@ -34,8 +51,9 @@ class Node:
     def neighbors(self):
         #TODO this is for local test only
         neighbor = []
-        for items in sys.argv[2:]:
+        for items in sys.argv[3:]:
             neighbor.append('132.205.9.'+items)
+            self.graph.add_edge(self.getNodeID(), clientNodeID('132.205.9.'+items))
         return neighbor
 
 def server(address, n):
@@ -61,14 +79,6 @@ def server(address, n):
         else:
             clientSocket.send(json.dumps({'response':'bad_request'}).encode())
         clientSocket.close()
-
-def clientNodeID(address):
-    print("requesting for id from {}".format(address))
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((address, 8001))
-    s.send(json.dumps({'request':'id'}).encode())
-    print(json.loads(s.recv(10000).decode()))
-    s.close()
 
 def clientNodeStatus(address):
     print("requesting for status from {}".format(address))
@@ -105,4 +115,4 @@ print(node.neighbors())
 node.VISITED = True
 
 callRecursive(node)
-print(nx.to_dict_of_lists(node))
+print(nx.to_dict_of_lists(node.graph))

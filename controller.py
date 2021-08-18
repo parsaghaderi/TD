@@ -26,7 +26,7 @@ def clientNodeID(address):
     print('node ID response')
     print(response['response'])
     print("###")
-    
+
     return response['response']
 
 class Node:
@@ -36,10 +36,14 @@ class Node:
     
     #TODO store this in variable so we don't calculate it each time.
     def getNodeID(self):
-        digest = ''
-        for items in sp.getoutput('ip link show').split('\n')[1::2]:
-            digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
-        return hashlib.sha256(digest.encode()).hexdigest()
+        # TODO for testing the unique ID is changed to primary IP address of each node. 
+        # digest = ''
+        # for items in sp.getoutput('ip link show').split('\n')[1::2]:
+        #     digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
+        # return hashlib.sha256(digest.encode()).hexdigest()
+        return sys.argv[2]
+
+
     def getGraph(self):
         return self.graph
 
@@ -52,7 +56,7 @@ class Node:
         # for items in sp.getoutput('ip -4 neighbor').split('\n'):
         #     if items.split()[0][:8] == '132.205.' and items.split()[3] != 'FAILED':
         #         neighbor.append(items.split()[0])
-        for items in sys.argv[2:]:
+        for items in sys.argv[3:]:
             neighbor.append('132.205.9.'+items)
             self.graph.add_edge(self.getNodeID(), clientNodeID('132.205.9.'+items))
         return neighbor
@@ -81,7 +85,6 @@ def server(address, n):
             node.lock = False
         elif req['request'] == 'id':
             print('incoming request for id from ' + address)
-            
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print('incoming request for update from ')
