@@ -84,7 +84,7 @@ def server(address, n):
             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
             node.lock = False
         elif req['request'] == 'id':
-            print('incoming request for id from ' + address)
+            print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
         elif req['request'] == 'update':
             print('incoming request for update from ')
