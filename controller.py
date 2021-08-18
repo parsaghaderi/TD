@@ -75,7 +75,7 @@ class Node:
         return neighbor
 
 node = Node()
-print(nx.to_dict_of_dicts(node.graph))
+print(nx.to_dict_of_dicts(node.graph.g))
 
 def server(address, n):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
