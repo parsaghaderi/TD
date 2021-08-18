@@ -16,18 +16,28 @@ class Graph:
     def getUpdate(self):
         return self.G
 
+# def clientNodeID(address):
+#     print("requesting for id from {}".format(address))
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     s.connect((address, 8001))
+#     s.send(json.dumps({'request':'id'}).encode())
+#     response = json.loads(s.recv(10000).decode())
+#     s.close()
+#     print('node ID response')
+#     print(response['response'])
+#     print("###")
+
+#     return response['response']
 def clientNodeID(address):
-    print("requesting for id from {}".format(address))
+    print("requesting for ID from {}".format(address))
+    import socket 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    import json
     s.send(json.dumps({'request':'id'}).encode())
-    response = json.loads(s.recv(10000).decode())
+    msg = json.loads(s.recv(10000).decode())
     s.close()
-    print('node ID response')
-    print(response['response'])
-    print("###")
-
-    return response['response']
+    return msg.get('response')
 
 class Node:
     graph = nx.Graph()
@@ -134,7 +144,17 @@ def callRecursive(parent, node):
             print('not equal')
             if not clientNodeStatus(item):
                 clientNodeUpdate(item, node)
-            
+
+def clientNodeID(address):
+    print("requesting for ID from {}".format(address))
+    import socket 
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    import json
+    s.send(json.dumps({'request':'id'}).encode())
+    msg = json.loads(s.recv(10000).decode())
+    s.close()
+    return msg.get('response')
             
 
 server(sys.argv[1], node)
