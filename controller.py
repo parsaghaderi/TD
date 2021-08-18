@@ -40,7 +40,7 @@ def clientNodeID(address):
     return msg.get('response')
 
 class Node:
-    graph = nx.Graph()
+    graph = Graph()
     VISITED = False
     lock = False
     
@@ -69,6 +69,9 @@ class Node:
         for items in sys.argv[3:]:
             neighbor.append('132.205.9.'+items)
             self.graph.add_edge(self.getNodeID(), clientNodeID('132.205.9.'+items))
+        print(neighbor)
+        print('***')
+        print(self.graph.g.edges())
         return neighbor
 
 node = Node()
