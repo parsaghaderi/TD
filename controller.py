@@ -149,16 +149,16 @@ def callRecursive(parent, node):
             if not clientNodeStatus(item):
                 clientNodeUpdate(item, node)
 
-def clientNodeID(address):
-    print("requesting for ID from {}".format(address))
-    import socket 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((address, 8001))
-    import json
-    s.send(json.dumps({'request':'id'}).encode())
-    msg = json.loads(s.recv(10000).decode())
-    s.close()
-    return msg.get('response')
+# def clientNodeID(address):
+#     print("requesting for ID from {}".format(address))
+#     import socket 
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     s.connect((address, 8001))
+#     import json
+#     s.send(json.dumps({'request':'id'}).encode())
+#     msg = json.loads(s.recv(10000).decode())
+#     s.close()
+#     return msg.get('response')
             
 
 server(sys.argv[1], node)
