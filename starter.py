@@ -144,8 +144,6 @@ def callRecursive(parent, node):
 
 
 node = Node()
-print(nx.to_dict_of_dicts(node.graph))
-
 print('neighbors')      
 node.VISITED = True
 
