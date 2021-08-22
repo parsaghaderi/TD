@@ -133,14 +133,10 @@ def clientNodeUpdate(address, node):
     tmp = nx.from_dict_of_dicts(msg['response'])
     nx.Graph.update(node.graph, tmp)
 
-def callRecursive(parent, node):
-    print(node.neighbors())
+def callRecursive(node):
     for item in node.neighbors():
-        print(item)
-        print(parent)
-        if item != parent:
-            if not clientNodeStatus(item):
-                clientNodeUpdate(item, node)
+        if not clientNodeStatus(item):
+            clientNodeUpdate(item, node)
 
 
 node = Node()
