@@ -145,3 +145,5 @@ def callRecursive(parent, node):
             print('{} can\'t send request to parent node {}'.format(item, parent))
 
 
+
+server('132.205.9.'+sys.argv[1], node)

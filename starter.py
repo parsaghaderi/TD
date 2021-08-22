@@ -139,3 +139,11 @@ def callRecursive(node):
     for item in node.neighbors():
         if not reqNodeStatus(item):
             reqNodeUpdate(item, node)
+
+node = Node()  
+node.VISITED = True
+
+callRecursive(node)
+
+print('FINAL')
+print(nx.to_dict_of_lists(node.graph))
