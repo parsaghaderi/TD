@@ -36,10 +36,12 @@ def clientNodeID(address):
     return msg.get('response')
 
 class Node:
+    node = None
     graph = Graph()
     VISITED = False
     lock = False
-
+    def __init__(self):
+        self.node = '132.205.9.'+sys.argv[2]
     '''
     request the unique ID of each node (address) to create the graph. 
     in this version the id is given as an argument but in future will be generated
@@ -75,7 +77,7 @@ node = Node()
 
 def server(address, n):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    address = '132.205.9.' + address
+    # address = '132.205.9.' + address
     s.bind((address, 8001))
     s.listen()
     while True:
@@ -144,4 +146,4 @@ def callRecursive(parent, node):
 
 
 
-server(sys.argv[1], node)
+server('132.205.9.'+sys.argv[1], node)
