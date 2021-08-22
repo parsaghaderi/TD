@@ -56,7 +56,7 @@ class Node:
         return self.graph
 
     def updateGraph(self, newGraph):
-        self.graph = nx.Graph.update(self.graph, newGraph)
+        nx.Graph.update(self.graph, newGraph)
     
     '''
     create the initial state of the graph for each node based on its neighbors. 

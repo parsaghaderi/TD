@@ -15,8 +15,15 @@ class Graph:
         self.g.add_edge(node1, node2)
     def getUpdate(self):
         return self.G
+    
+    #return the graph as a dictionary of lists, key is the node, value is a list of connections
+    def getDict(self):
+        return nx.to_dict_of_lists(self.g)
 
-
+'''
+    request the unique ID of each node (address) to create the graph. 
+    in this version the id is given as an argument but in future will be generated
+'''
 def clientNodeID(address):
     print("requesting for ID from {}".format(address))
     import socket 
@@ -29,68 +36,95 @@ def clientNodeID(address):
     return msg.get('response')
 
 class Node:
-    graph = nx.Graph()
+    node = None
+    graph = Graph()
     VISITED = False
-
+    lock = False
+    def __init__(self):
+        self.node = '132.205.9.'+sys.argv[2]
+    '''
+    request the unique ID of each node (address) to create the graph. 
+    in this version the id is given as an argument but in future will be generated
+    '''
     def getNodeID(self):
         # TODO for testing the unique ID is changed to primary IP address of each node. 
-        # digest = ''
-        # for items in sp.getoutput('ip link show').split('\n')[1::2]:
-        #     digest+=hashlib.sha256(items.split()[-3].encode()).hexdigest()
-        # return hashlib.sha256(digest.encode()).hexdigest()
         return '132.205.9.'+sys.argv[2]
 
+    '''
+    return the graph as it is in the networkx format. 
+
+    '''
     def getGraph(self):
         return self.graph
 
     def updateGraph(self, newGraph):
-        self.graph = nx.Graph.update(self.graph, newGraph)
+        nx.Graph.update(self.graph, newGraph)
     
+    '''
+    create the initial state of the graph for each node based on its neighbors. 
+    TODO the neighbors are passed as arguments, must find neighbors automatically. 
+    '''
     def neighbors(self):
-        #TODO this is for local test only
         neighbor = []
         for items in sys.argv[3:]:
             neighbor.append('132.205.9.'+items)
             self.graph.add_edge(self.getNodeID(), clientNodeID('132.205.9.'+items))
+        print(neighbor)
+        print(self.graph.g.edges())
         return neighbor
 
 def server(address, n):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    address = '132.205.9.' + address
     s.bind((address, 8001))
     s.listen()
     while True:
         clientSocket, clientAddress = s.accept()
+        address = clientAddress
         print("node {} connected".format(address))
         req = json.loads(clientSocket.recv(10000).decode())
         if req['request'] == 'status':
-            print("{} request for status".format(clientAddress))
+            print("incoming request for status from ")
+            print(address)
+            print("****")
+            while node.lock:
+                pass
+            node.lock = True
             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
+            node.lock = False
         elif req['request'] == 'id':
-            print("{} request for id".format(clientAddress))
+            print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.getNodeID()}).encode())
+            node.neighbors()
         elif req['request'] == 'update':
-            print("{} request for update".format(clientAddress))
-            callRecursive(address, clientAddress, n)
+            print('incoming request for update from ')
+            print(address)
+            print("****")
+            #semaphore lock
+            while node.lock:
+                print('lock')
+            node.lock = True
+            node.VISITED = True
+            callRecursive(address[0], node)
             clientSocket.send(json.dumps({'response': nx.to_dict_of_dicts(n.graph)}).encode())
-            n.VISITED = not(n.VISITED)
-            clientSocket.close()
+            node.lock = False
         else:
             clientSocket.send(json.dumps({'response':'bad_request'}).encode())
         clientSocket.close()
+
 
 def clientNodeStatus(address):
     print("requesting for status from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'status'}).encode())
-    print('*****')
     response = json.loads(s.recv(10000).decode())
+    print(response)
     s.close()
     return response.get('response')
 
-
 def clientNodeUpdate(address, node):
-    print("outgoing request for update from {}".format(address))
+    print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'update'}).encode())
@@ -99,18 +133,20 @@ def clientNodeUpdate(address, node):
     tmp = nx.from_dict_of_dicts(msg['response'])
     nx.Graph.update(node.graph, tmp)
 
-def callRecursive(node):
+def callRecursive(parent, node):
+    print(node.neighbors())
     for item in node.neighbors():
-        if not clientNodeStatus(item):
-            clientNodeUpdate(item, node)
+        print(item)
+        print(parent)
+        if item != parent:
+            if not clientNodeStatus(item):
+                clientNodeUpdate(item, node)
 
 
 node = Node()
 print(nx.to_dict_of_dicts(node.graph))
 
 print('neighbors')      
-print(node.neighbors())  
-
 node.VISITED = True
 
 callRecursive(node)
