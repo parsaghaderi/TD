@@ -87,7 +87,7 @@ def server(address, n):
         address = clientAddress
         print(" node {} is connected.".format(address))
 
-        req = json.loads(clientSocket.recv(10000).decode)
+        req = json.loads(clientSocket.recv(10000).decode())
         print('request is {}'.format(req))
         if req['request'] == 'status':
             print("incoming request for status from {}".format(address[0]))
