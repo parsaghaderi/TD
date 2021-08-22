@@ -15,19 +15,15 @@ class Graph:
         self.g.add_edge(node1, node2)
     def getUpdate(self):
         return self.G
+    
+    #return the graph as a dictionary of lists, key is the node, value is a list of connections
+    def getDict(self):
+        return nx.to_dict_of_lists(self.g)
 
-# def clientNodeID(address):
-#     print("requesting for id from {}".format(address))
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.connect((address, 8001))
-#     s.send(json.dumps({'request':'id'}).encode())
-#     response = json.loads(s.recv(10000).decode())
-#     s.close()
-#     print('node ID response')
-#     print(response['response'])
-#     print("###")
-
-#     return response['response']
+'''
+    request the unique ID of each node (address) to create the graph. 
+    in this version the id is given as an argument but in future will be generated
+'''
 def clientNodeID(address):
     print("requesting for ID from {}".format(address))
     import socket 
@@ -43,8 +39,13 @@ class Node:
     graph = Graph()
     VISITED = False
     lock = False
-    
-    #TODO store this in variable so we don't calculate it each time.
+    def __init__(self):
+        self.graph.add_edge()
+
+    '''
+    request the unique ID of each node (address) to create the graph. 
+    in this version the id is given as an argument but in future will be generated
+    '''
     def getNodeID(self):
         # TODO for testing the unique ID is changed to primary IP address of each node. 
         # digest = ''

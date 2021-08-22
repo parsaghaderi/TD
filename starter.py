@@ -16,18 +16,6 @@ class Graph:
     def getUpdate(self):
         return self.G
 
-# def clientNodeID(address):
-#     print("requesting for id from {}".format(address))
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.connect((address, 8001))
-#     s.send(json.dumps({'request':'id'}).encode())
-#     response = json.loads(s.recv(10000).decode())
-#     s.close()
-#     print('node ID response')
-#     print(response['response'])
-#     print("###")
-    
-#     return response['response']
 
 def clientNodeID(address):
     print("requesting for ID from {}".format(address))
