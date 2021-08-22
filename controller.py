@@ -136,13 +136,12 @@ def clientNodeUpdate(address, node):
     nx.Graph.update(node.graph, tmp)
 
 def callRecursive(parent, node):
-    print(node.neighbors())
     for item in node.neighbors():
-        print(item)
-        print(parent)
         if item != parent:
             if not clientNodeStatus(item):
                 clientNodeUpdate(item, node)
+            else:
+                print(item + ' already visited.')
 
 
 
