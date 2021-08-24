@@ -73,7 +73,7 @@ class Node:
             ID = reqNodeID('132.205.9.'+ items)
             print('Requested ID from {} is {}, they should be equal!'.format(items, ID))
             self.graph.add_edge(self.node, ID)
-            return neighbors
+        return neighbors
 
 node = Node()
 

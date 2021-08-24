@@ -66,6 +66,7 @@ class Node:
         nx.Graph.update(self.graph, newGraph)
     
     def neighbors(self):
+        print("requesting ID from the neighbors")
         neighbors = []
         for items in sys.argv[3:]:
             neighbors.append('132.205.9.'+items)
