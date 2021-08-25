@@ -153,7 +153,7 @@ def threaded_client(clientSocket, clientAddress, node):
     clientSocket.close()
     print('connection from {} for - {} - request is closed'.format(clientAddress[0], req['request']))
 
-def server(address):
+def server(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((address, 8001))
     s.listen(20)
@@ -161,7 +161,7 @@ def server(address):
     while True:
         clientSocket, clientAddress = s.accept()
         print(" node {} is connected.".format(str(clientAddress))) 
-        start_new_thread(threaded_client, (clientSocket))
+        start_new_thread(threaded_client, (clientSocket, clientAddress, node))
         
 
 def reqNodeStatus(address):
