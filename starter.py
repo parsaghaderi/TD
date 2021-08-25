@@ -132,12 +132,13 @@ def reqNodeStatus(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     # sending the parent node in json format
-    # s.send(json.dumps({'parent':'132.205.9.'+sys.argv[2]}).encode())
+    # s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    return response.get('response')
+    print("*****" + response['response'] + '*********')
+    return response['response']
 
 def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
