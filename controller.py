@@ -110,7 +110,7 @@ def server(address, node):
                 print('lock')
             node.lock = True
             node.VISITED = True
-            callRecursive(address[0], node)
+            callRecursive(node)
             clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(n.graph)}).encode()) #changed
             node.lock = False
         else:
