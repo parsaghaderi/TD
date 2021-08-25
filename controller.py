@@ -121,7 +121,6 @@ def server(address, node):
             # node.lock = False
         else:
             print('bad request')
-        s.close()
         node.lock = False
         
 
