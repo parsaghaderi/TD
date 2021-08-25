@@ -156,8 +156,10 @@ def reqNodeUpdate(address, node):
 
 def callRecursive(node):
     for item in node.neighbors():
-        if not reqNodeStatus(item):
-            reqNodeUpdate(item, node)
+        if reqNodeStatus(item) == 'False':
+                reqNodeUpdate(item, node)
+        else:
+            print('{} is already visited'.format(item))
 
 node = Node()  
 node.VISITED = True
