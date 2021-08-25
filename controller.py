@@ -135,7 +135,10 @@ def threaded_client(clientSocket, clientAddress, node):
 
     if req['request'] == 'status':
             print("incoming request for status from {}".format(clientAddress[0]))
-            clientSocket.send(json.dumps({'response':node.VISITED}).encode())
+            if node.VISITED == True:
+                clientSocket.send(json.dumps({'response':'True'}).encode())
+            else:
+                clientSocket.send(json.dumps({'response':'False'}).encode())
             print("response to status request was sent to {}".format(clientAddress[0]))
 
     elif req['request'] == 'id':
@@ -175,7 +178,7 @@ def reqNodeStatus(address):
     print(response)
     s.close()
     print("*****" + response['response'] + '*********')
-    return response.get('response')
+    return response['response']
 
 def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
@@ -194,7 +197,7 @@ def reqNodeUpdate(address, node):
 def callRecursive(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
-            if not reqNodeStatus(item):
+            if reqNodeStatus(item) == 'False':
                 reqNodeUpdate(item, node)
             else:
                 print('{} is already visited'.format(item))
