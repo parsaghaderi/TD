@@ -40,8 +40,8 @@ def reqNodeID(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     # sending the parent node in json format
-    s.send(json.dumps({'parent':sys.argv[2]}).encode())
-    s.send(json.dumps({'request':'id'}).encode())
+    # s.send(json.dumps({'parent':'132.205.9.'+sys.argv[2]}).encode())
+    s.send(json.dumps({'request':'id', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     msg = json.loads(s.recv(10000).decode())
     s.close()
     return msg.get('response')
@@ -88,10 +88,9 @@ def server(address, node):
     while(True):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
-        print(" node {} is connected.".format(address))
-        parent = json.loads(clientSocket.recv(10000).decode())
-        node.parent = parent['parent']   
         req = json.loads(clientSocket.recv(10000).decode())
+        node.parent = req['parent']   
+        print(req['parent'])
         print('request is {}'.format(req))
         if req['request'] == 'status':
             print("incoming request for status from {}".format(address[0]))
@@ -122,8 +121,8 @@ def reqNodeStatus(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     # sending the parent node in json format
-    s.send(json.dumps({'parent':sys.argv[2]}).encode())
-    s.send(json.dumps({'request':'status'}).encode())
+    # s.send(json.dumps({'parent':sys.argv[2]}).encode())
+    s.send(json.dumps({'request':'update', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
@@ -134,8 +133,8 @@ def reqNodeUpdate(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     # sending the parent node in json format
-    s.send(json.dumps({'parent':sys.argv[2]}).encode())
-    s.send(json.dumps({'request':'update'}).encode())
+    # s.send(json.dumps({'parent':sys.argv[2]}).encode())
+    s.send(json.dumps({'request':'update', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
