@@ -191,7 +191,7 @@ def reqNodeUpdate(address, node):
     print('Graph updated')
 
 def callRecursive(node):
-    for item in node.neighbors():
+    for item in node.neighbors(node.parent):
         if item != node.parent:
             if not reqNodeStatus(item):
                 reqNodeUpdate(item, node)
