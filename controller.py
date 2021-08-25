@@ -89,7 +89,7 @@ def server(address, node):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
         print(" node {} is connected.".format(address))  
-        
+
         while node.lock:
             print('waiting')
             time.sleep(0.3)    
@@ -105,7 +105,7 @@ def server(address, node):
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.node}).encode())
-            node.neighbors()
+            # node.neighbors()
         elif req['request'] == 'update':
             print('incoming request for update from {}'.format(address[0]))
             #semaphore lock

@@ -94,7 +94,7 @@ def server(address, n):
             print('waiting')
             time.sleep(0.3)    
         node.lock = True
-        
+
         req = json.loads(clientSocket.recv(10000).decode())
         node.parent = req['parent']
         print(req['parent'])
@@ -105,7 +105,7 @@ def server(address, n):
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.node}).encode())
-            node.neighbors()
+            # node.neighbors()
         elif req['request'] == 'update':
             print('incoming request for update from {}'.format(address[0]))
             #semaphore lock
