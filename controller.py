@@ -193,8 +193,10 @@ def reqNodeUpdate(address, node):
 def callRecursive(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
-            if reqNodeStatus(item) == True:
-                print("***********")
+            print("***********")
+            print(reqNodeStatus(item))
+            print("***********")
+
             if not reqNodeStatus(item):
                 reqNodeUpdate(item, node)
             else:
