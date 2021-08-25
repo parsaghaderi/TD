@@ -88,7 +88,9 @@ def server(address, n):
     while(True):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
-        print(" node {} is connected.".format(address))        
+        print(" node {} is connected.".format(address)) 
+        parent = json.loads(clientSocket.recv(10000).decode())
+        node.parent = parent['parent']         
         req = json.loads(clientSocket.recv(10000).decode())
         print('request is {}'.format(req))
         if req['request'] == 'status':
