@@ -9,7 +9,7 @@ import hashlib
 import _thread
 import sys
 import json
-
+import time
 
 '''
 graph class, in charge of handling the graph not the node. 
@@ -89,17 +89,19 @@ def server(address, n):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
         print(" node {} is connected.".format(address))  
+
+        while node.lock:
+            print('waiting')
+            time.sleep(0.3)    
+        node.lock = True
+        
         req = json.loads(clientSocket.recv(10000).decode())
         node.parent = req['parent']
         print(req['parent'])
         print('request is {}'.format(req))
         if req['request'] == 'status':
             print("incoming request for status from {}".format(address[0]))
-            while node.lock:
-                pass
-            node.lock = True
             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
-            node.lock = False
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.node}).encode())
@@ -107,15 +109,16 @@ def server(address, n):
         elif req['request'] == 'update':
             print('incoming request for update from {}'.format(address[0]))
             #semaphore lock
-            while node.lock:
-                print('lock')
-            node.lock = True
+            # while node.lock:
+            #     print('lock')
+            # node.lock = True
             node.VISITED = True
             callRecursive(address[0], node)
             clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(n.graph)}).encode()) #changed
-            node.lock = False
+            # node.lock = False
         else:
             print('bad request')
+        node.lock = False
 
 def reqNodeStatus(address):
     print("outgoing request for status to {}".format(address))
