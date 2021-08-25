@@ -8,6 +8,7 @@ import subprocess as sp
 import hashlib
 import _thread
 import sys
+import json
 
 
 '''
@@ -39,7 +40,8 @@ def reqNodeID(address):
     print("requesting ID from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    import json
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'id'}).encode())
     msg = json.loads(s.recv(10000).decode())
     s.close()
@@ -56,6 +58,7 @@ class Node:
     graph = Graph() 
     VISITED = False
     lock = False
+    parent = None
     #TODO will be deleted for next version
     def __init__(self):
         self.node = '132.205.9.'+ sys.argv[2]
@@ -85,8 +88,7 @@ def server(address, n):
     while(True):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
-        print(" node {} is connected.".format(address))
-
+        print(" node {} is connected.".format(address))        
         req = json.loads(clientSocket.recv(10000).decode())
         print('request is {}'.format(req))
         if req['request'] == 'status':
@@ -117,6 +119,8 @@ def reqNodeStatus(address):
     print("outgoing request for status to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'status'}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
@@ -127,6 +131,8 @@ def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'update'}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)

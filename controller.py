@@ -8,6 +8,7 @@ import subprocess as sp
 import hashlib
 import _thread
 import sys
+import json
 
 '''
 graph class, in charge of handling the graph not the node. 
@@ -38,7 +39,8 @@ def reqNodeID(address):
     print("requesting ID from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    import json
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'id'}).encode())
     msg = json.loads(s.recv(10000).decode())
     s.close()
@@ -55,6 +57,7 @@ class Node:
     graph = Graph() 
     VISITED = False
     lock = False
+    parent = None
     #TODO will be deleted for next version
     def __init__(self):
         self.node = '132.205.9.'+ sys.argv[2]
@@ -73,11 +76,11 @@ class Node:
             ID = reqNodeID('132.205.9.'+ items)
             print('Requested ID from {} is {}, they should be equal!'.format(items, ID))
             self.graph.add_edge(self.node, ID)
-            return neighbors
+        return neighbors
 
 node = Node()
 
-def server(address, n):
+def server(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((address, 8001))
     s.listen()
@@ -86,7 +89,7 @@ def server(address, n):
         clientSocket, clientAddress = s.accept()
         address = clientAddress
         print(" node {} is connected.".format(address))
-
+        node.parent = '132.205.9.'+s.recv(10000).decode()
         req = json.loads(clientSocket.recv(10000).decode())
         print('request is {}'.format(req))
         if req['request'] == 'status':
@@ -117,6 +120,8 @@ def reqNodeStatus(address):
     print("outgoing request for status to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'status'}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
@@ -127,6 +132,8 @@ def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    # sending the parent node in json format
+    s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'update'}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
@@ -135,15 +142,15 @@ def reqNodeUpdate(address, node):
     nx.Graph.update(node.graph, tmp)
     print('Graph updated')
 
-def callRecursive(parent, node):
+def callRecursive(node):
     for item in node.neighbors():
-        if item != parent:
-            if not clientNodeStatus(item):
-                clientNodeUpdate(item, node)
+        if item != node.parent:
+            if not reqNodeStatus(item):
+                reqNodeUpdate(item, node)
             else:
                 print('{} is already visited'.format(item))
         else:
-            print('{} can\'t send request to parent node {}'.format(item, parent))
+            print('{} can\'t send request to parent node {}'.format(item, node.parent))
 
 
 
