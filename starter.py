@@ -80,7 +80,7 @@ class Node:
 
 node = Node()
 
-def server(address, n):
+def server(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((address, 8001))
     s.listen(20)
@@ -105,19 +105,24 @@ def server(address, n):
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.node}).encode())
+            print('response to id request from '+ str(address) + ' was sent')
+
             # node.neighbors()
         elif req['request'] == 'update':
             print('incoming request for update from {}'.format(address[0]))
+            print('response to update request from '+str(address) + ' was sent')
+
             #semaphore lock
             # while node.lock:
             #     print('lock')
             # node.lock = True
             node.VISITED = True
             callRecursive(address[0], node)
-            clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(n.graph)}).encode()) #changed
+            clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
             # node.lock = False
         else:
             print('bad request')
+        s.close()
         node.lock = False
 
 def reqNodeStatus(address):

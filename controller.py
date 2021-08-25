@@ -105,6 +105,8 @@ def server(address, node):
         elif req['request'] == 'id':
             print('incoming request for id from ' + str(address))
             clientSocket.send(json.dumps({'response':node.node}).encode())
+            print('response to id request from '+ str(address) + ' was sent')
+            
             # node.neighbors()
         elif req['request'] == 'update':
             print('incoming request for update from {}'.format(address[0]))
@@ -114,10 +116,12 @@ def server(address, node):
             # node.lock = True
             node.VISITED = True
             callRecursive(node)
-            clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(n.graph)}).encode()) #changed
+            clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
+            print('response to update request from '+str(address) + ' was sent')
             # node.lock = False
         else:
             print('bad request')
+        s.close()
         node.lock = False
         
 
