@@ -133,7 +133,7 @@ def reqNodeStatus(address):
     s.connect((address, 8001))
     # sending the parent node in json format
     # s.send(json.dumps({'parent':'132.205.9.'+sys.argv[2]}).encode())
-    s.send(json.dumps({'request':'update', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    s.send(json.dumps({'request':'status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
