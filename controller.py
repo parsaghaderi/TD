@@ -146,7 +146,7 @@ def threaded_client(clientSocket, clientAddress, node):
     elif req['request'] == 'update':
         print('incoming request for update from {}'.format(format(clientAddress[0])))
         node.VISITED = True
-        callRecursive(format(clientAddress[0]), node)
+        callRecursive(node)
         clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
     else:
         print('bad request')
