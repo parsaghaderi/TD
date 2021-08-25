@@ -164,6 +164,6 @@ node.VISITED = True
 callRecursive(node)
 
 print('FINAL')
-print(nx.to_dict_of_lists(node.graph))
+print(nx.to_dict_of_lists(node.graph.g))
 
 
