@@ -83,7 +83,7 @@ node = Node()
 def server(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((address, 8001))
-    s.listen()
+    s.listen(20)
 
     while(True):
         clientSocket, clientAddress = s.accept()
