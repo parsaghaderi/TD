@@ -174,6 +174,7 @@ def reqNodeStatus(address):
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
+    print("*****" + response['response'] + '*********')
     return response.get('response')
 
 def reqNodeUpdate(address, node):
@@ -193,10 +194,6 @@ def reqNodeUpdate(address, node):
 def callRecursive(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
-            print("***********")
-            print(reqNodeStatus(item))
-            print("***********")
-
             if not reqNodeStatus(item):
                 reqNodeUpdate(item, node)
             else:
