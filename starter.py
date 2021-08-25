@@ -150,7 +150,7 @@ def reqNodeUpdate(address, node):
     print(response)
     s.close()
     tmp = nx.from_dict_of_lists(response['response'])
-    nx.Graph.update(node.graph, tmp)
+    nx.Graph.update(node.graph.g, tmp)
     print('Graph updated')
 
 def callRecursive(node):
