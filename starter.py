@@ -171,3 +171,4 @@ print(nx.to_dict_of_lists(node.graph.g))
 
 
 nx.draw(node.graph.g)
+plt.savefig('fig.png')
