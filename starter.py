@@ -69,60 +69,63 @@ class Node:
     def updateGraph(self, newGraph):
         nx.Graph.update(self.graph, newGraph)
     
-    def neighbors(self):
+    def neighbors(self, parent = None ):
         neighbors = []
         for items in sys.argv[3:]:
-            neighbors.append('132.205.9.'+items)
-            ID = reqNodeID('132.205.9.'+ items)
-            print('Requested ID from {} is {}, they should be equal!'.format(items, ID))
-            self.graph.add_edge(self.node, ID)
+            if '132.205.9.'+items != parent:
+                neighbors.append('132.205.9.'+items)
+                ID = reqNodeID('132.205.9.'+ items)
+                print('Requested ID from {} is {}, they should be equal!'.format(items, ID))
+                self.graph.add_edge(self.node, ID)
+            else:
+                self.graph.add_edge(self.node, parent)
         return neighbors
 
 node = Node()
 
-def server(address, node):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((address, 8001))
-    s.listen(20)
+# def server(address, node):
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     s.bind((address, 8001))
+#     s.listen(20)
 
-    while(True):
-        clientSocket, clientAddress = s.accept()
-        address = clientAddress
-        print(" node {} is connected.".format(address))  
+#     while(True):
+#         clientSocket, clientAddress = s.accept()
+#         address = clientAddress
+#         print(" node {} is connected.".format(address)) 
 
-        while node.lock:
-            print('waiting')
-            time.sleep(0.3)    
-        node.lock = True
+#         while node.lock:
+#             print('waiting')
+#             time.sleep(0.3)    
+#         node.lock = True
 
-        req = json.loads(clientSocket.recv(10000).decode())
-        node.parent = req['parent']
-        print(req['parent'])
-        print('request is {}'.format(req))
-        if req['request'] == 'status':
-            print("incoming request for status from {}".format(address[0]))
-            clientSocket.send(json.dumps({'response':node.VISITED}).encode())
-        elif req['request'] == 'id':
-            print('incoming request for id from ' + str(address))
-            clientSocket.send(json.dumps({'response':node.node}).encode())
-            print('response to id request from '+ str(address) + ' was sent')
+#         req = json.loads(clientSocket.recv(10000).decode())
+#         node.parent = req['parent']
+#         print(req['parent'])
+#         print('request is {}'.format(req))
+#         if req['request'] == 'status':
+#             print("incoming request for status from {}".format(address[0]))
+#             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
+#         elif req['request'] == 'id':
+#             print('incoming request for id from ' + str(address))
+#             clientSocket.send(json.dumps({'response':node.node}).encode())
+#             print('response to id request from '+ str(address) + ' was sent')
 
-            # node.neighbors()
-        elif req['request'] == 'update':
-            print('incoming request for update from {}'.format(address[0]))
-            print('response to update request from '+str(address) + ' was sent')
+#             # node.neighbors()
+#         elif req['request'] == 'update':
+#             print('incoming request for update from {}'.format(address[0]))
+#             print('response to update request from '+str(address) + ' was sent')
 
-            #semaphore lock
-            # while node.lock:
-            #     print('lock')
-            # node.lock = True
-            node.VISITED = True
-            callRecursive(address[0], node)
-            clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
-            # node.lock = False
-        else:
-            print('bad request')
-        node.lock = False
+#             #semaphore lock
+#             # while node.lock:
+#             #     print('lock')
+#             # node.lock = True
+#             node.VISITED = True
+#             callRecursive(address[0], node)
+#             clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
+#             # node.lock = False
+#         else:
+#             print('bad request')
+#         node.lock = False
 
 def reqNodeStatus(address):
     print("outgoing request for status to {}".format(address))
@@ -162,3 +165,5 @@ callRecursive(node)
 
 print('FINAL')
 print(nx.to_dict_of_lists(node.graph))
+
+
