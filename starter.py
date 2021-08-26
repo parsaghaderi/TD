@@ -40,8 +40,6 @@ def reqNodeID(address):
     print("requesting ID from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    # sending the parent node in json format
-    # s.send(json.dumps({'parent':'132.205.9.'+sys.argv[2]}).encode())
     s.send(json.dumps({'request':'id', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     msg = json.loads(s.recv(10000).decode())
     s.close()

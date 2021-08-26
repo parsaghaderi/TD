@@ -43,8 +43,6 @@ def reqNodeID(address):
     print("requesting ID from {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    # sending the parent node in json format
-    # s.send(json.dumps({'parent':'132.205.9.'+sys.argv[2]}).encode())
     s.send(json.dumps({'request':'id', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     msg = json.loads(s.recv(10000).decode())
     s.close()
@@ -86,6 +84,7 @@ class Node:
         return neighbors
 
 node = Node()
+
 '''
     by multithreading the socket, the controller is able to accpet multiple connections at once.
     clientSocket and clientAddress are attribute of the client socket
@@ -147,6 +146,7 @@ def reqNodeStatus(address):
     print(response)
     s.close()
     return response['response']
+
 '''
 requesting the latest version of the nodes graph (map)
 @param address: address of the desired node
@@ -163,6 +163,7 @@ def reqNodeUpdate(address, node):
     tmp = nx.from_dict_of_lists(response['response'])
     nx.Graph.update(node.graph.g, tmp)
     print('Graph updated')
+
 '''
 calling the update on all neighbors
 @param node: node has a list of all neighbors
