@@ -86,49 +86,11 @@ class Node:
         return neighbors
 
 node = Node()
-
-# def server(address, node):
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind((address, 8001))
-#     s.listen(20)
-
-#     while(True):
-#         clientSocket, clientAddress = s.accept()
-#         address = clientAddress
-#         print(" node {} is connected.".format(address))  
-
-#         while node.lock:
-#             print('waiting')
-#             time.sleep(0.3)    
-#         node.lock = True
-
-#         req = json.loads(clientSocket.recv(10000).decode())
-#         node.parent = req['parent']   
-#         print(req['parent'])
-#         print('request is {}'.format(req))
-#         if req['request'] == 'status':
-#             print("incoming request for status from {}".format(address[0]))
-#             clientSocket.send(json.dumps({'response':node.VISITED}).encode())
-#         elif req['request'] == 'id':
-#             print('incoming request for id from ' + str(address))
-#             clientSocket.send(json.dumps({'response':node.node}).encode())
-#             print('response to id request from '+ str(address) + ' was sent')
-            
-#             # node.neighbors()
-#         elif req['request'] == 'update':
-#             print('incoming request for update from {}'.format(address[0]))
-#             #semaphore lock
-#             # while node.lock:
-#             #     print('lock')
-#             # node.lock = True
-#             node.VISITED = True
-#             callRecursive(node)
-#             clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph)}).encode()) #changed
-#             print('response to update request from '+str(address) + ' was sent')
-#             # node.lock = False
-#         else:
-#             print('bad request')
-#         node.lock = False
+'''
+    by multithreading the socket, the controller is able to accpet multiple connections at once.
+    clientSocket and clientAddress are attribute of the client socket
+    an instance of node will be passed to the thread.
+'''
 def threaded_client(clientSocket, clientAddress, node):
     req = json.loads(clientSocket.recv(10000).decode())
     node.parent = req['parent']
@@ -156,6 +118,10 @@ def threaded_client(clientSocket, clientAddress, node):
     clientSocket.close()
     print('connection from {} for - {} - request is closed'.format(clientAddress[0], req['request']))
 
+'''
+the server is responsible for creating a socket and accepting new connections. 
+for each new connection a new thread would be created. 
+'''
 def server(address, node):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((address, 8001))
@@ -166,26 +132,30 @@ def server(address, node):
         print(" node {} is connected.".format(str(clientAddress))) 
         start_new_thread(threaded_client, (clientSocket, clientAddress, node))
         
-
+'''
+requesting the status of the node.
+@return True/False (str)
+returns the status of the desired node. 
+@param address: address of the desired node to find out its status
+'''
 def reqNodeStatus(address):
     print("outgoing request for status to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    # sending the parent node in json format
-    # s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    print("*****" + response['response'] + '*********')
     return response['response']
-
+'''
+requesting the latest version of the nodes graph (map)
+@param address: address of the desired node
+@param node: an instance of the local node
+'''
 def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    # sending the parent node in json format
-    # s.send(json.dumps({'parent':sys.argv[2]}).encode())
     s.send(json.dumps({'request':'update', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
@@ -193,7 +163,12 @@ def reqNodeUpdate(address, node):
     tmp = nx.from_dict_of_lists(response['response'])
     nx.Graph.update(node.graph.g, tmp)
     print('Graph updated')
-
+'''
+calling the update on all neighbors
+@param node: node has a list of all neighbors
+    in this version the neighbors are passed as arguments but for future versions it would be discovered
+    as a part of neighbor discovery
+'''
 def callRecursive(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
