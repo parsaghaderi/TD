@@ -58,6 +58,8 @@ class Node:
     node = None
     graph = Graph() 
     VISITED = False
+    Cluster_ID = None
+    Cluster_head = False
     lock = False
     parent = None
     #TODO will be deleted for next version
