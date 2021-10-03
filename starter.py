@@ -79,6 +79,9 @@ class Node:
                 self.graph.add_edge(self.node, parent)
         return neighbors
 
+    clusterID = 0
+    clusterVISITED = False
+
 node = Node()
 '''
 requesting the status of the node.
@@ -112,6 +115,7 @@ def reqNodeUpdate(address, node):
     tmp = nx.from_dict_of_lists(response['response'])
     nx.Graph.update(node.graph.g, tmp)
     print('Graph updated')
+
 '''
 calling the update on all neighbors
 @param node: node has a list of all neighbors
@@ -126,13 +130,46 @@ def callRecursive(node):
             print('{} is already visited'.format(item))
 
 node = Node()  
-node.VISITED = True
+
 
 callRecursive(node)
 
 print('FINAL')
 print(nx.to_dict_of_lists(node.graph.g))
-
-
 nx.draw(node.graph.g)
 plt.savefig('fig.png')
+
+
+
+def reqNodeClusterStatus(address):
+    print("outgoing request for status to {}".format(address))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'cluster_status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    print("*****" + response['response'] + '*********')
+    return response['response']
+
+
+def reqNodeCluster(address, node):
+    print("outgoing request for update to {}".format(address))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'cluster', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    tmp = nx.from_dict_of_lists(response['response'])
+    nx.Graph.update(node.graph.g, tmp)
+    print('Graph updated')
+
+
+def callRecursiveCluster(node):
+    for item in node.neighbors():
+        if reqNodeClusterStatus(item) == 'False':
+                reqNodeCluster(item, node)
+        else:
+            print('{} is already assigned to a cluster'.format(item))
+
