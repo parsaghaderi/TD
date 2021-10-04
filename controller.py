@@ -162,10 +162,11 @@ def server(address, node):
     s.listen(20)
 
     while True:
+        print("\n###############\n\t"+node.clusterID+"\n#############\n")
         clientSocket, clientAddress = s.accept()
         print(" node {} is connected.".format(str(clientAddress))) 
         start_new_thread(threaded_client, (clientSocket, clientAddress, node))
-        print("\n###############\n\t"+node.clusterID+"\n#############\n")
+        
         
 '''
 requesting the status of the node.
