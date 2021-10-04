@@ -119,11 +119,13 @@ def threaded_client(clientSocket, clientAddress, node):
         clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph.g)}).encode()) #changed
     elif req['request'] == 'cluster_status':
         print("incoming request for cluster status from {}".format(clientAddress[0]))
+        print("************\n************\n\t in req cluster stat" + "\n************\n************\n")
         if node.clusterSet == True:
             clientSocket.send(json.dumps({'response':'True'}).encode())
         else:
             clientSocket.send(json.dumps({'response':'False'}).encode())
         print("response to cluster_status request was sent to {}".format(clientAddress[0]))
+        print("************\n************\n\t in req cluster update" + "\n************\n************\n")
     elif req['request'] == 'cluster':
         print('incoming request for cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
@@ -196,6 +198,10 @@ def callRecursive(node):
                 print('{} is already visited'.format(item))
         else:
             print('{} can\'t send request to parent node {}'.format(item, node.parent))
+
+
+
+
 
 
 def reqClusterStatus(address):
