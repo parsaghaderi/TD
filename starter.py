@@ -172,4 +172,3 @@ def callRecursiveCluster(node):
             print('{} is already assigned to a cluster'.format(item))
 
 callRecursiveCluster(node)
-callRecursiveCluster(node)
