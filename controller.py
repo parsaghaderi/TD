@@ -200,6 +200,7 @@ def callRecursive(node):
 
 def reqClusterStatus(address):
     print("outgoing request for cluster status to {}".format(address))
+    print("************\n************\n\t out req cluster stat" + "\n************\n************\n")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'cluster_status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
@@ -210,6 +211,7 @@ def reqClusterStatus(address):
 
 def reqClusterUpdate(address, node):
     print("outgoing request for cluster update to {}".format(address))
+    print("************\n************\n\t out req cluster update" + "\n************\n************\n")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'cluster', 'parent':'132.205.9.'+sys.argv[2]}).encode())
