@@ -164,11 +164,36 @@ def reqClusterUpdate(address, node):
     node.clusterID = response['response']
     print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
 
+def setClusterID(address, ID):
+    print("outgoing request to set cluster ID to {}".format(address))
+    print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response']
+
+def reqNeighborSize(address):
+    print("outgoing request for neighbor size to {}".format(address))
+    print("************\n************\n\t out req neigh size" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'neighbors', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response']
+
 
 def callRecursiveCluster(node):
     for item in node.neighbors():
         if reqClusterStatus(item) == 'False':
-                reqClusterUpdate(item, node)
+                if len(reqNeighborSize(item)) > 1:
+                    reqClusterUpdate(item, node)
+                else:
+                    setClusterID(item, sys.argv[2])
         else:
             print('{} is already assigned to a cluster'.format(item))
 

@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import socket
 import pickle, json
 import matplotlib.pyplot as plt
@@ -84,6 +85,10 @@ class Node:
                 self.graph.add_edge(self.node, parent)
         return neighbors
 
+    def neighbors(self):
+        print("requesting number of neighbors")
+        return len(sys.argv[4:]) #important
+
     clusterID = sys.argv[3]
     clusterSet = False
     clusterCapacity = 2
@@ -131,6 +136,15 @@ def threaded_client(clientSocket, clientAddress, node):
         node.clusterSet = True
         callRecursiveCluster(node)
         clientSocket.send(json.dumps({'response': node.clusterID}).encode())
+    elif req['request'] == 'set_cluster':
+        print('incoming request to forced cluster ID from {}'.format(format(clientAddress[0])))
+        node.clusterSet = True
+        node.clusterID = req['value']
+        print("*******\n******\n\t"+node.clusterID+"\n******\n******")
+
+    elif req['request'] == 'neighbors':
+        print('incoming request for # neighbors from {}'.format(format(clientAddress[0])))
+        clientSocket.send(json.dumps({'response': node.neighbor()}).encode())
     else:
         print('bad request')
     clientSocket.close()
@@ -149,6 +163,7 @@ def server(address, node):
         clientSocket, clientAddress = s.accept()
         print(" node {} is connected.".format(str(clientAddress))) 
         start_new_thread(threaded_client, (clientSocket, clientAddress, node))
+        print("\n###############\n\t"+node.clusterID+"\n#############\n")
         
 '''
 requesting the status of the node.
@@ -226,16 +241,38 @@ def reqClusterUpdate(address, node):
     s.close()
     node.clusterID = response['response']
     print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
-    # tmp = nx.from_dict_of_lists(response['response'])
-    # nx.Graph.update(node.graph.g, tmp)
-    # print('Graph updated')
 
+
+def setClusterID(address, ID):
+    print("outgoing request to set cluster ID to {}".format(address))
+    print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response']
+
+def reqNeighborSize(address):
+    print("outgoing request for neighbor size to {}".format(address))
+    print("************\n************\n\t out req neigh size" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'neighbors', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response']
 
 def callRecursiveCluster(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
             if reqClusterStatus(item) == 'False':
-                reqClusterUpdate(item, node)
+                if len(reqNeighborSize(item)) > 1:
+                    reqClusterUpdate(item, node)
+                else:
+                    setClusterID(item, sys.argv[2])
             else:
                 print('{} is already visited'.format(item))
         else:
@@ -243,4 +280,5 @@ def callRecursiveCluster(node):
 
 
 server('132.205.9.'+sys.argv[1], node)
+
 
