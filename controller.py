@@ -72,7 +72,7 @@ class Node:
     def updateGraph(self, newGraph):
         nx.Graph.update(self.graph, newGraph)
     neighbor_list = [] #will be computed first in TD then used in cluster
-    
+
     def neighbors(self, parent):
         print("requesting ID from the neighbors")
         neighbors = []
@@ -91,7 +91,7 @@ class Node:
         print("requesting number of neighbors")
         return len(sys.argv[3:]) #important
 
-    clusterID = sys.argv[3]
+    clusterID = sys.argv[2]
     clusterSet = False
     clusterCapacity = 2
     
