@@ -235,7 +235,7 @@ def callRecursiveCluster(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
             if reqClusterStatus(item) == 'False':
-                reqNodeUpdate(item, node)
+                reqClusterUpdate(item, node)
             else:
                 print('{} is already visited'.format(item))
         else:
