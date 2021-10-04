@@ -192,10 +192,11 @@ def reqNeighborSize(address):
 def callRecursiveCluster(node):
     for item in node.neighbors_list:
         if reqClusterStatus(item) == 'False':
-                if reqNeighborSize(item)> 1:
-                    reqClusterUpdate(item, node)
-                else:
-                    setClusterID(item, sys.argv[2])
+            tmp = reqNeighborSize(item)
+            if tmp > 1:
+                reqClusterUpdate(item, node)
+            else:
+                setClusterID(item, sys.argv[2])
         else:
             print('{} is already assigned to a cluster'.format(item))
 
