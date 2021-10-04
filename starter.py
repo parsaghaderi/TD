@@ -78,7 +78,7 @@ class Node:
             else:
                 self.graph.add_edge(self.node, parent)
         return neighbors
-
+        
     clusterID = 0
     clusterVISITED = False
 
@@ -130,7 +130,7 @@ def callRecursive(node):
             print('{} is already visited'.format(item))
 
 node = Node()  
-
+node.VISITED = True
 
 callRecursive(node)
 
@@ -141,35 +141,35 @@ plt.savefig('fig.png')
 
 
 
-def reqNodeClusterStatus(address):
-    print("outgoing request for status to {}".format(address))
+def reqClusterStatus(address):
+    print("outgoing request for cluster status to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'cluster_status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    print("*****" + response['response'] + '*********')
     return response['response']
 
 
-def reqNodeCluster(address, node):
-    print("outgoing request for update to {}".format(address))
+def reqClusterUpdate(address, node):
+    print("outgoing request for cluster update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'cluster', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    tmp = nx.from_dict_of_lists(response['response'])
-    nx.Graph.update(node.graph.g, tmp)
-    print('Graph updated')
+    node.clusterID = response['response']
+    print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
 
 
 def callRecursiveCluster(node):
     for item in node.neighbors():
-        if reqNodeClusterStatus(item) == 'False':
-                reqNodeCluster(item, node)
+        if reqClusterStatus(item) == 'False':
+                reqClusterUpdate(item, node)
         else:
             print('{} is already assigned to a cluster'.format(item))
 
+callRecursiveCluster(node)
+callRecursiveCluster(node)

@@ -13,6 +13,7 @@ import time
 import os
 from _thread import *
 
+
 THREADS = 0
 '''
 graph class, in charge of handling the graph not the node. 
@@ -58,8 +59,6 @@ class Node:
     node = None
     graph = Graph() 
     VISITED = False
-    Cluster_ID = None
-    Cluster_head = False
     lock = False
     parent = None
     #TODO will be deleted for next version
@@ -85,6 +84,10 @@ class Node:
                 self.graph.add_edge(self.node, parent)
         return neighbors
 
+    clusterID = sys.argv[3]
+    clusterSet = False
+    clusterCapacity = 2
+    
 node = Node()
 
 '''
@@ -114,6 +117,18 @@ def threaded_client(clientSocket, clientAddress, node):
         node.VISITED = True
         callRecursive(node)
         clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph.g)}).encode()) #changed
+    elif req['request'] == 'cluster_status':
+        print("incoming request for cluster status from {}".format(clientAddress[0]))
+        if node.clusterSet == True:
+            clientSocket.send(json.dumps({'response':'True'}).encode())
+        else:
+            clientSocket.send(json.dumps({'response':'False'}).encode())
+        print("response to cluster_status request was sent to {}".format(clientAddress[0]))
+    elif req['request'] == 'cluster':
+        print('incoming request for cluster ID from {}'.format(format(clientAddress[0])))
+        node.clusterSet = True
+        callRecursiveCluster(node)
+        clientSocket.send(json.dumps({'response': node.clusterID}).encode())
     else:
         print('bad request')
     clientSocket.close()
@@ -182,6 +197,41 @@ def callRecursive(node):
         else:
             print('{} can\'t send request to parent node {}'.format(item, node.parent))
 
+
+def reqClusterStatus(address):
+    print("outgoing request for cluster status to {}".format(address))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'cluster_status', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response']
+
+def reqClusterUpdate(address, node):
+    print("outgoing request for cluster update to {}".format(address))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'cluster', 'parent':'132.205.9.'+sys.argv[2]}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    node.clusterID = response['response']
+    print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
+    # tmp = nx.from_dict_of_lists(response['response'])
+    # nx.Graph.update(node.graph.g, tmp)
+    # print('Graph updated')
+
+
+def callRecursiveCluster(node):
+    for item in node.neighbors(node.parent):
+        if item != node.parent:
+            if reqClusterStatus(item) == 'False':
+                reqNodeUpdate(item, node)
+            else:
+                print('{} is already visited'.format(item))
+        else:
+            print('{} can\'t send request to parent node {}'.format(item, node.parent))
 
 
 server('132.205.9.'+sys.argv[1], node)
