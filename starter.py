@@ -81,8 +81,9 @@ class Node:
         self.neighbors_list = neighbors
         return neighbors
         
-    clusterID = 0
-    clusterVISITED = False
+    clusterID = sys.argv[2]
+    clusterCapacity = 2
+    clusterSet = False
 
 node = Node()
 '''
@@ -163,7 +164,12 @@ def reqClusterUpdate(address, node):
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    node.clusterID = response['response']
+    if response['capacity'] == -1:
+        node.clusterID = sys.argv[2]
+        node.clusterCapacity = 2
+    else:
+        node.clusterID = response['response']
+        node.clusterCapacity = response['capacity']
     print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
 
 def setClusterID(address, ID):

@@ -139,7 +139,8 @@ def threaded_client(clientSocket, clientAddress, node):
         print('incoming request for cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
         callRecursiveCluster(node)
-        clientSocket.send(json.dumps({'response': node.clusterID}).encode())
+        node.clusterCapacity -= 1
+        clientSocket.send(json.dumps({'response': node.clusterID, 'capacity':node.clusterCapacity}).encode())
         print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
     elif req['request'] == 'set_cluster':
         print('incoming request to forced cluster ID from {}'.format(format(clientAddress[0])))
@@ -247,7 +248,12 @@ def reqClusterUpdate(address, node):
     response = json.loads(s.recv(10000).decode())
     print(response)
     s.close()
-    node.clusterID = response['response']
+    if response['capacity'] == -1:
+        node.clusterID = sys.argv[2]
+        node.clusterCapacity = 2
+    else:
+        node.clusterID = response['response']
+        node.clusterCapacity = response['capacity']
     print("************\n************\n\t" + node.clusterID + "\n************\n************\n")
 
 
