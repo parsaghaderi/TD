@@ -57,6 +57,7 @@ class Node:
     VISITED = False
     lock = False
     parent = None
+    neighbors_list = []
     #TODO will be deleted for next version
     def __init__(self):
         self.node = '132.205.9.'+ sys.argv[2]
@@ -77,6 +78,7 @@ class Node:
                 self.graph.add_edge(self.node, ID)
             else:
                 self.graph.add_edge(self.node, parent)
+        self.neighbors_list = neighbors
         return neighbors
         
     clusterID = 0
@@ -188,7 +190,7 @@ def reqNeighborSize(address):
 
 
 def callRecursiveCluster(node):
-    for item in node.neighbors():
+    for item in node.neighbors_list:
         if reqClusterStatus(item) == 'False':
                 if reqNeighborSize(item)> 1:
                     reqClusterUpdate(item, node)

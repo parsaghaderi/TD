@@ -71,6 +71,7 @@ class Node:
     
     def updateGraph(self, newGraph):
         nx.Graph.update(self.graph, newGraph)
+    neighbor_list = [] #will be computed first in TD then used in cluster
     
     def neighbors(self, parent):
         print("requesting ID from the neighbors")
@@ -83,6 +84,7 @@ class Node:
                 self.graph.add_edge(self.node, ID)
             else:
                 self.graph.add_edge(self.node, parent)
+        self.neighbor_list = neighbors
         return neighbors
 
     def neighborSize(self):
@@ -249,10 +251,7 @@ def setClusterID(address, ID):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID}).encode())
-    response = json.loads(s.recv(10000).decode())
-    print(response)
     s.close()
-    return response['response']
 
 def reqNeighborSize(address):
     print("outgoing request for neighbor size to {}".format(address))
@@ -266,7 +265,7 @@ def reqNeighborSize(address):
     return response['response']
 
 def callRecursiveCluster(node):
-    for item in node.neighbors(node.parent):
+    for item in node.neighbor_list:
         if item != node.parent:
             if reqClusterStatus(item) == 'False':
                 if reqNeighborSize(item) > 1:
