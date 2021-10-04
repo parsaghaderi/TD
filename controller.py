@@ -159,7 +159,7 @@ def threaded_client(clientSocket, clientAddress, node):
     elif req['request'] == 'neighbors':
         print('incoming request for # neighbors from {}'.format(format(clientAddress[0])))
         clientSocket.send(json.dumps({'response': node.neighborSize()}).encode())
-        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n"+node.clusterCapacity+"\n&&&&&&&\n&&&&&&")
+        print("&&&&&&&&\n&&&&&&&\n\t{}\n{}\n&&&&&&&\n&&&&&&".format(node.clusterID, node.clusterCapacity))
 
     else:
         print('bad request')
