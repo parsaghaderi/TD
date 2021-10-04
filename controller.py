@@ -85,7 +85,7 @@ class Node:
                 self.graph.add_edge(self.node, parent)
         return neighbors
 
-    def neighbors(self):
+    def neighbors():
         print("requesting number of neighbors")
         return len(sys.argv[4:]) #important
 
