@@ -87,7 +87,7 @@ class Node:
 
     def neighborSize(self):
         print("requesting number of neighbors")
-        return len(sys.argv[4:]) #important
+        return len(sys.argv[3:]) #important
 
     clusterID = sys.argv[3]
     clusterSet = False
