@@ -124,6 +124,7 @@ def threaded_client(clientSocket, clientAddress, node):
         node.VISITED = True
         callRecursive(node)
         clientSocket.send(json.dumps({'response': nx.to_dict_of_lists(node.graph.g)}).encode()) #changed
+        
     elif req['request'] == 'cluster_status':
         print("incoming request for cluster status from {}".format(clientAddress[0]))
         print("************\n************\n\t in req cluster stat" + "\n************\n************\n")
@@ -133,20 +134,23 @@ def threaded_client(clientSocket, clientAddress, node):
             clientSocket.send(json.dumps({'response':'False'}).encode())
         print("response to cluster_status request was sent to {}".format(clientAddress[0]))
         print("************\n************\n\t in req cluster update" + "\n************\n************\n")
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
     elif req['request'] == 'cluster':
         print('incoming request for cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
         callRecursiveCluster(node)
         clientSocket.send(json.dumps({'response': node.clusterID}).encode())
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
     elif req['request'] == 'set_cluster':
         print('incoming request to forced cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
         node.clusterID = req['value']
-        print("*******\n******\n\t"+node.clusterID+"\n******\n******")
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
 
     elif req['request'] == 'neighbors':
         print('incoming request for # neighbors from {}'.format(format(clientAddress[0])))
         clientSocket.send(json.dumps({'response': node.neighborSize()}).encode())
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
     else:
         print('bad request')
     clientSocket.close()
@@ -163,6 +167,7 @@ def server(address, node):
 
     while True:
         print("\n###############\n\t"+node.clusterID+"\n#############\n")
+        print("waiting for new request\n")
         clientSocket, clientAddress = s.accept()
         print(" node {} is connected.".format(str(clientAddress))) 
         start_new_thread(threaded_client, (clientSocket, clientAddress, node))
