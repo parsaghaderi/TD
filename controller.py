@@ -85,7 +85,7 @@ class Node:
                 self.graph.add_edge(self.node, parent)
         return neighbors
 
-    def neighbors():
+    def neighborSize(self):
         print("requesting number of neighbors")
         return len(sys.argv[4:]) #important
 
@@ -144,7 +144,7 @@ def threaded_client(clientSocket, clientAddress, node):
 
     elif req['request'] == 'neighbors':
         print('incoming request for # neighbors from {}'.format(format(clientAddress[0])))
-        clientSocket.send(json.dumps({'response': node.neighbor()}).encode())
+        clientSocket.send(json.dumps({'response': node.neighborSize()}).encode())
     else:
         print('bad request')
     clientSocket.close()
