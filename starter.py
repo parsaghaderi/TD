@@ -81,9 +81,9 @@ class Node:
         self.neighbors_list = neighbors
         return neighbors
         
-    clusterID = 0
-    clusterVISITED = False
-
+    clusterID = sys.argv[2]
+    clusterSet = False
+    clusterCapacity = 5
 node = Node()
 '''
 requesting the status of the node.
@@ -110,6 +110,7 @@ def reqNodeUpdate(address, node):
     print("outgoing request for update to {}".format(address))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
+    node.clusterCapacity -= 1
     s.send(json.dumps({'request':'update', 'parent':'132.205.9.'+sys.argv[2]}).encode())
     response = json.loads(s.recv(10000).decode())
     print(response)
@@ -118,28 +119,7 @@ def reqNodeUpdate(address, node):
     nx.Graph.update(node.graph.g, tmp)
     print('Graph updated')
 
-'''
-calling the update on all neighbors
-@param node: node has a list of all neighbors
-    in this version the neighbors are passed as arguments but for future versions it would be discovered
-    as a part of neighbor discovery
-'''
-def callRecursive(node):
-    for item in node.neighbors():
-        if reqNodeStatus(item) == 'False':
-                reqNodeUpdate(item, node)
-        else:
-            print('{} is already visited'.format(item))
 
-node = Node()  
-node.VISITED = True
-
-callRecursive(node)
-
-print('FINAL')
-print(nx.to_dict_of_lists(node.graph.g))
-nx.draw(node.graph.g)
-plt.savefig('fig.png')
 
 
 
@@ -171,11 +151,19 @@ def setClusterID(address, ID):
     print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID}).encode())
-    response = json.loads(s.recv(10000).decode())
-    print(response)
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID,
+                                                'capacity':node.clusterCapacity}).encode()) #TODO check for -1 if needed
     s.close()
-    return response['response']
+
+def setClusterIDSingle(address, ID):
+    print("outgoing request to set cluster ID to {}".format(address))
+    print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID,
+                                                'capacity':1}).encode())
+    s.close()
+
 
 def reqNeighborSize(address):
     print("outgoing request for neighbor size to {}".format(address))
@@ -183,21 +171,61 @@ def reqNeighborSize(address):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
     s.send(json.dumps({'request':'neighbors', 'parent':'132.205.9.'+sys.argv[2]}).encode())
-    response = json.loads(s.recv(10000).decode())
-    print(response)
     s.close()
-    return response['response']
 
 
 def callRecursiveCluster(node):
+    neighbors_size = {}
+    for item in node.neighbors_list:
+        neighbors_size[item] = reqNeighborSize(item)
+    sorted_neighbors = dict(sorted(neighbors_size.items(), key=lambda item: item[1]))
+    sorted_neighbors_list = list(sorted_neighbors.keys())
+    neighbor_capacity = {}
+    for item in sorted_neighbors_list:
+        if neighbors_size[item] > node.clusterCapacity:
+            neighbor_capacity[item] = node.clusterCapacity
+            break
+        elif neighbors_size[item]<=node.clusterCapacity:
+            if node.clusterCapacity == 0:
+                neighbor_capacity[item] = 0
+            neighbor_capacity[item] = neighbors_size[item]
+            node.clusterCapacity = node.clusterCapacity - neighbors_size[item]
+
     for item in node.neighbors_list:
         if reqClusterStatus(item) == 'False':
             tmp = reqNeighborSize(item)
             if tmp > 1:
                 reqClusterUpdate(item, node)
             else:
-                setClusterID(item, sys.argv[2])
+                setClusterIDSingle(item, sys.argv[2])
         else:
             print('{} is already assigned to a cluster'.format(item))
+
+
+
+
+'''
+calling the update on all neighbors
+@param node: node has a list of all neighbors
+    in this version the neighbors are passed as arguments but for future versions it would be discovered
+    as a part of neighbor discovery
+'''
+def callRecursive(node):
+    for item in node.neighbors():
+        if reqNodeStatus(item) == 'False':
+
+                reqNodeUpdate(item, node)
+        else:
+            print('{} is already visited'.format(item))
+
+node = Node()  
+node.VISITED = True
+
+callRecursive(node)
+
+print('FINAL')
+print(nx.to_dict_of_lists(node.graph.g))
+nx.draw(node.graph.g)
+plt.savefig('fig.png')
 
 callRecursiveCluster(node)

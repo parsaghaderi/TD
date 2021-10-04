@@ -134,23 +134,33 @@ def threaded_client(clientSocket, clientAddress, node):
             clientSocket.send(json.dumps({'response':'False'}).encode())
         print("response to cluster_status request was sent to {}".format(clientAddress[0]))
         print("************\n************\n\t in req cluster update" + "\n************\n************\n")
-        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n"+node.clusterCapacity+"\n&&&&&&&\n&&&&&&")
+
     elif req['request'] == 'cluster':
         print('incoming request for cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
         callRecursiveCluster(node)
         clientSocket.send(json.dumps({'response': node.clusterID}).encode())
-        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n"+node.clusterCapacity+"\n&&&&&&&\n&&&&&&")
+
     elif req['request'] == 'set_cluster':
         print('incoming request to forced cluster ID from {}'.format(format(clientAddress[0])))
         node.clusterSet = True
-        node.clusterID = req['value']
-        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
+        
+        if req['capacity'] <= 0:
+            node.clusterCapacity = 4 #change #TODO
+            node.clusterID = sys.argv[2]
+        else:
+            node.clusterCapacity = req['capacity']
+            node.clusterID = req['value']
+
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n"+node.clusterCapacity+"\n&&&&&&&\n&&&&&&")
 
     elif req['request'] == 'neighbors':
         print('incoming request for # neighbors from {}'.format(format(clientAddress[0])))
         clientSocket.send(json.dumps({'response': node.neighborSize()}).encode())
-        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n&&&&&&&\n&&&&&&")
+        print("&&&&&&&&\n&&&&&&&\n\t"+node.clusterID+"\n"+node.clusterCapacity+"\n&&&&&&&\n&&&&&&")
+
     else:
         print('bad request')
     clientSocket.close()
@@ -256,8 +266,21 @@ def setClusterID(address, ID):
     print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((address, 8001))
-    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID}).encode())
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID,
+                                                'capacity':1}).encode())
     s.close()
+
+def setClusterIDSingle(address, ID):
+    print("outgoing request to set cluster ID to {}".format(address))
+    print("************\n************\n\t out req set cluster ID" + "\n************\n************\n")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, 8001))
+    s.send(json.dumps({'request':'set_cluster', 'parent':'132.205.9.'+sys.argv[2], 'value': ID,
+                                                'capacity':1}).encode())
+    response = json.loads(s.recv(10000).decode())
+    print(response)
+    s.close()
+    return response['response'] 
 
 def reqNeighborSize(address):
     print("outgoing request for neighbor size to {}".format(address))
@@ -271,6 +294,22 @@ def reqNeighborSize(address):
     return response['response']
 
 def callRecursiveCluster(node):
+    neighbors_size = {}
+    for item in node.neighbors_list:
+        neighbors_size[item] = reqNeighborSize(item)
+    sorted_neighbors = dict(sorted(neighbors_size.items(), key=lambda item: item[1]))
+    sorted_neighbors_list = list(sorted_neighbors.keys())
+    neighbor_capacity = {}
+    for item in sorted_neighbors_list:
+        if neighbors_size[item] > node.clusterCapacity:
+            neighbor_capacity[item] = node.clusterCapacity
+            break
+        elif neighbors_size[item]<=node.clusterCapacity:
+            if node.clusterCapacity == 0:
+                neighbor_capacity[item] = 0
+            neighbor_capacity[item] = neighbors_size[item]
+            node.clusterCapacity = node.clusterCapacity - neighbors_size[item]
+
     for item in node.neighbor_list:
         if item != node.parent:
             if reqClusterStatus(item) == 'False':
@@ -278,7 +317,7 @@ def callRecursiveCluster(node):
                 if tmp > 1:
                     reqClusterUpdate(item, node)
                 else:
-                    setClusterID(item, sys.argv[2])
+                    setClusterIDSingle(item, sys.argv[2])
             else:
                 print('{} is already visited'.format(item))
         else:
