@@ -269,7 +269,7 @@ def callRecursiveCluster(node):
     for item in node.neighbors(node.parent):
         if item != node.parent:
             if reqClusterStatus(item) == 'False':
-                if len(reqNeighborSize(item)) > 1:
+                if reqNeighborSize(item) > 1:
                     reqClusterUpdate(item, node)
                 else:
                     setClusterID(item, sys.argv[2])
